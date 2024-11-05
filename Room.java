@@ -1,6 +1,7 @@
 import java.util.Set;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.ArrayList;
 
 /**
  * Class Room - a room in an adventure game.
@@ -12,14 +13,15 @@ import java.util.Iterator;
  * connected to other rooms via exits.  For each existing exit, the room 
  * stores a reference to the neighboring room.
  * 
- * @author  Michael Kölling and David J. Barnes
- * @version 2016.02.29
+ * @ Leslie Acevedo
+ * @version 2024.11.05
  */
 
 public class Room 
 {
     private String description;
     private HashMap<String, Room> exits;        // stores exits of this room.
+    private ArrayList<Item> items;
 
     /**
      * Create a room described "description". Initially, it has
@@ -31,6 +33,7 @@ public class Room
     {
         this.description = description;
         exits = new HashMap<>();
+        items = new ArrayList<Item>();
     }
 
     /**
@@ -60,7 +63,12 @@ public class Room
      */
     public String getLongDescription()
     {
-        return "You are " + description + ".\n" + getExitString();
+        if (items.size() > 0){
+            String output = "You are " + description + ".\n" + getExitString() +"\n";
+            output.concat("Here you find: " + seeItems() + "\n");
+            return output;  
+        }
+        return "You are " + description + ".\n" + getExitString() +"\n";
     }
 
     /**
@@ -88,5 +96,30 @@ public class Room
     {
         return exits.get(direction);
     }
+    // add items 
+    public void addItem(Item item)
+    {
+        items.add(item);
+    }
+    //@return string of all items 
+    public String seeItems()
+    {
+        String output = "";
+        for (Item item : items) {
+            output = output.concat(item.getDescription() + " ");
+        }
+        return output;
+    }
+    // @return arraylist of all items 
+    public ArrayList<Item> takeItems()
+    {
+        ArrayList<Item> output = new ArrayList<Item>();
+        for (Item item : items) {
+            output.add(item);
+        }
+        items.clear();
+        return output;
+    }
+
 }
 

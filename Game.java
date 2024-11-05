@@ -11,14 +11,15 @@
  *  rooms, creates the parser and starts the game.  It also evaluates and
  *  executes the commands that the parser returns.
  * 
- * @author  Michael Kölling and David J. Barnes
- * @version 2016.02.29
+ * @author Leslie Acevedo
+ * @version 2024.11.04
  */
 
 public class Game 
 {
     private Parser parser;
     private Room currentRoom;
+    private Player player;
         
     /**
      * Create the game and initialise its internal map.
@@ -27,6 +28,13 @@ public class Game
     {
         createRooms();
         parser = new Parser();
+        player = new Player();
+    }
+    //main
+    public static void main (String[]args)
+    {
+        Game game = new Game();
+        game.play();
     }
 
     /**
@@ -34,7 +42,7 @@ public class Game
      */
     private void createRooms()
     {
-        Room outside, theater, pub, lab, office;
+        Room outside, theater, pub, lab, office, closet, roof, kitchen;
       
         // create the rooms
         outside = new Room("outside the main entrance of the university");
@@ -42,6 +50,9 @@ public class Game
         pub = new Room("in the campus pub");
         lab = new Room("in a computing lab");
         office = new Room("in the computing admin office");
+        closet = new Room("in the coat closet");
+        roof = new Room("on the roof");
+        kitchen = new Room("in the campus kitchen"); 
         
         // initialise room exits
         outside.setExit("east", theater);
@@ -56,7 +67,30 @@ public class Game
         lab.setExit("east", office);
 
         office.setExit("west", lab);
-
+        
+        closet.setExit("north", outside);
+        
+        roof.setExit("south", lab);
+        
+        kitchen.setExit("west", pub);
+        
+        //initialize items 
+        outside.addItem(new Item("chair",1,true));
+        
+        theater.addItem(new Item("microphone",2,false));
+        
+        pub.addItem(new Item("table",1,true));
+        
+        lab.addItem(new Item("beakers",2,false));
+        
+        office.addItem(new Item ("laptop",1,true));
+        
+        closet.addItem(new Item ("coats",2,false));
+        
+        roof.addItem(new Item("soccerball",1,false));
+        
+        kitchen.addItem(new Item("spoon",1,true));
+    
         currentRoom = outside;  // start game outside
     }
 
@@ -118,6 +152,22 @@ public class Game
             case QUIT:
                 wantToQuit = quit(command);
                 break;
+                
+            case LOOK:
+                look();
+                break;
+                
+            case EAT:
+                wantToQuit = player.eat(command.getSecondWord());
+                break;
+        
+            case DROP:
+                currentRoom.addItem(player.drop(command.getSecondWord()));
+                break;
+                
+            case TAKE:
+                player.take(currentRoom.takeItems());
+                break;
         }
         return wantToQuit;
     }
@@ -157,11 +207,15 @@ public class Game
 
         if (nextRoom == null) {
             System.out.println("There is no door!");
-        }
-        else {
+        } else {
             currentRoom = nextRoom;
             System.out.println(currentRoom.getLongDescription());
         }
+    }
+    // look around 
+    private void look()
+    {
+        System.out.println(currentRoom.getLongDescription());
     }
 
     /** 
